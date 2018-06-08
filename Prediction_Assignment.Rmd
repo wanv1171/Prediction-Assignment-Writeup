@@ -1,0 +1,232 @@
+---
+title: "Prediction_Assignment"
+author: "Mingda Wang"
+date: "Jun 7 2018"
+output: html_document
+---
+
+```{r setup, message=FALSE, include=FALSE}
+library("knitr")
+library("caret")
+library("polycor")
+library("MLmetrics")
+library("rattle")
+Sys.setlocale("LC_ALL","English")
+opts_chunk$set(eval = TRUE, echo = TRUE)
+```
+## Project Goal
+The goal of your project is to predict the manner in which they did the exercise. This is the "classe" variable in the training set. You may use any of the other variables to predict with. You should create a report describing how you built your model, how you used cross validation, what you think the expected out of sample error is, and why you made the choices you did. You will also use your prediction model to predict 20 different test cases.
+
+## Synopsis
+In this project, I will explore the given dataset, and apply classfication algorithm on the data. After testing with both decision tree and random forest algorithm with repeated cross validation and cross validation. The accuracy for random forest is over 99% when inlucding all variables, and 98% when only including variables that has a correlation higher than median correlation. Eventually, I have made predictions toward the grading dataset using random forest.
+
+
+##Load Dataset
+Load both training and testing dataset from csv, and remove the rownames column.
+```{r dataLoading}
+pmlTrain <- read.csv("pml-training.csv", sep=",")
+pmlTrain <- pmlTrain[,-1]
+pmlTest <- read.csv("pml-testing.csv", sep=",")
+pmlTest <- pmlTest[,-1]
+```
+
+## Dataset Processing
+By looking at the pmlTest dataset, we immediatly notice some of the columns have most NAs in them. We would like to set a threshold that if over 95% of values in the columns are NAs, we will not include 
+these variables when making our model. Although we can impute the value based on the avg value of the 
+subject, it is unnecessary to include them when new data having NA values in them.
+```{r removeNA}
+threshold <- 0.95 * nrow(pmlTrain)
+noNATrain <- pmlTrain[,colSums(is.na(pmlTrain)) < threshold]
+```
+In addition, we will remove variables that has almost no variance. These variables are not useful as 
+the values are most static in those columns. We will also remove variables such as timestamp and username.
+```{r removeNZV}
+nzvCols <- nearZeroVar(noNATrain)
+training <- noNATrain[,-nzvCols]
+
+training <- training[,-grep("timestamp", colnames(training))]
+training <- training[,-1]
+```
+Now, we have a finalized training dataset that contains only the variables needed. We will now subset 
+our pmlTest dataset to include only variables in our finalized training dataset.
+```{r createNewTrainingTesting}
+colsNeeded <- colnames(training)
+gradeTesting <- pmlTest[,which(colnames(pmlTest) %in% colsNeeded)]
+gradeTesting$problem_id <- pmlTest$problem_id
+```
+
+## Create Model Training & Testing Dataset
+This will split the previously cleaned up training data into 2 groups based on classe variable in the training dataset. The modelTrain dataset will include 60% of the total data in training while the modelTest dataset will include the rest 40%.
+```{r trainingSubset}
+set.seed(11211)
+
+inTrain <- createDataPartition(training$classe, p=0.6, list=FALSE)
+modelTrain <- training[inTrain,]
+modelTest <- training[-inTrain,]
+```
+
+## Correlation Analysis
+Since classe data is not a continous variable, we cannot use pearson correlation. Therefore, we will 
+use the hector function in the polycor library. The hector will utilize pearson for continous to continous, polychoric for nominal to nominal, and polyserial for nominal to continous correlations
+```{r corAnalysis}
+corAnalysis <- suppressWarnings(hetcor(modelTrain$classe,modelTrain[,-54]))
+corVal <- abs(corAnalysis$correlations[1,])
+corType <- corAnalysis$type[1,]
+
+corDF <- data.frame("Correlation Strength Absolute" = corVal,
+                    "Correlation Type" = corType)
+
+corDF <- corDF[order(-corDF[,"Correlation.Strength.Absolute"]),]
+print(t(corDF))
+```
+The above dataframe shows the correlations strength between classe and rest variables in descending order.
+
+## Prediction Models
+Firstly, we will run few models against all variables in the modelTrain dataset. Then, we can investigate on using only subset of those data based on our correlation analysis.
+
+### Decision Tree with rPart
+#### All Variables Included
+```{r}
+dtAllModel <- suppressWarnings(train(classe~.,
+                                     data=modelTrain,
+                                     method="rpart",
+                                     tuneLength = 50,
+                                     metric="Accuracy",
+                                     trControl = trainControl(method = "repeatedcv",
+                                                              number = 5,
+                                                              repeats = 5,
+                                                              summaryFunction = multiClassSummary,
+                                                              classProbs = TRUE)))
+
+dtAllPredTest <- predict(dtAllModel, modelTest)
+```
+
+##### Model Accuracy for Test Data:
+```{r}
+cmDtAllModel <- confusionMatrix(dtAllPredTest,modelTest$classe)
+print(cmDtAllModel$table)
+```
+
+```{r}
+print(paste("Accuracy", cmDtAllModel$overall[1]))
+```
+
+#### Only More Correlated Variables Included
+```{r}
+upperMedianVars <- rownames(corDF[corDF$Correlation.Strength.Absolute > median(corDF$Correlation.Strength.Absolute),])
+
+upperMedianVars[1] <- "classe"
+```
+This returns variables that is more correlated than median correlation in the correlation strength.
+
+```{r}
+selectedVarTrain <- modelTrain[,upperMedianVars]
+selectedVarTest <- modelTest[,upperMedianVars]
+
+dtCorVarModel <- suppressWarnings(train(classe~.,
+                                     data=selectedVarTrain,
+                                     method="rpart",
+                                     tuneLength = 50,
+                                     metric="Accuracy",
+                                     trControl = trainControl(method = "repeatedcv",
+                                                              number = 5,
+                                                              repeats = 5,
+                                                              summaryFunction = multiClassSummary,
+                                                              classProbs = TRUE)))
+dtCorVarModelPredTest <- predict(dtCorVarModel, selectedVarTest)
+```
+
+##### Model Accuracy for Test Data:
+```{r}
+cmDtCorVarModel <- confusionMatrix(dtCorVarModelPredTest,selectedVarTest$classe)
+print(cmDtCorVarModel$table)
+```
+
+```{r}
+print(paste("Accuracy", cmDtCorVarModel$overall[1]))
+```
+
+From this, we can see there is a around 3% accuracy reduction from using all variables. However, we 
+have only included half of the predictors. Not only the modelling speed is faster, but the results 
+are not too much off from using all results.
+
+#### Confusion Matrix Plots
+```{r dtConfusionMatrixPlot}
+par(mfrow=c(1,2))
+
+plot(cmDtAllModel$table, main="All Variables Confusion Matrix Plot")
+plot(cmDtCorVarModel$table, main="Upper Median Correlating Variables Confusion Matrix Plot")
+```
+
+### Random Forest Modelling
+The accuracy for deicsion tree is pretty high, but I would like to try random forest, and see if that will increase our accuracy even higher.
+
+#### Random Forest for All Vairables
+```{r}
+rfAllModel <- suppressWarnings(train(classe~.,
+                                     data=modelTrain,
+                                     method="rf",
+                                     trControl = trainControl(
+                                       method = "cv",
+                                       number = 5)))
+
+rfAllPredTest <- predict(rfAllModel, modelTest)
+```
+
+##### Model Accuracy for Test Data:
+```{r}
+cmRfAllModel <- confusionMatrix(rfAllPredTest,modelTest$classe)
+print(cmRfAllModel$table)
+```
+
+```{r}
+print(paste("Accuracy", cmRfAllModel$overall[1]))
+```
+
+#### Random Forest for Upper Median Correlated Vairables
+
+```{r}
+rfCorVarModel <- suppressWarnings(train(classe~.,
+                                     data=selectedVarTrain,
+                                     method="rf",
+                                     trControl = trainControl(
+                                       method = "cv",
+                                       number = 5)))
+
+rfCorVarModelPredTest <- predict(rfCorVarModel, selectedVarTest)
+```
+
+##### Model Accuracy for Test Data:
+```{r}
+cmRfCorVarModel <- confusionMatrix(rfCorVarModelPredTest,selectedVarTest$classe)
+print(cmRfCorVarModel$table)
+```
+
+```{r}
+print(paste("Accuracy", cmRfCorVarModel$overall[1]))
+```
+
+#### Confusion Matrix Plots
+```{r rfConfusionMatrixPlot}
+par(mfrow=c(1,2))
+
+plot(cmRfAllModel$table, main="All Variables Confusion Matrix Plot")
+plot(cmRfCorVarModel$table, main="Upper Median Correlating Variables Confusion Matrix Plot")
+```
+
+We can see that random forest model has a much higher prediction accuracy than rpart model. Also, at both times, less variables yields a minor reduction in accuract, but a much faster processing time.
+
+## Getting Prediction for Grading Data
+```{r}
+gradingPrediction <- predict(rfAllModel, gradeTesting)
+
+print(data.frame(
+  "problem_id" = gradeTesting$problem_id,
+  "prediction" = gradingPrediction
+))
+```
+
+
+
+
+
