@@ -77,7 +77,7 @@ corDF <- data.frame("Correlation Strength Absolute" = corVal,
                     "Correlation Type" = corType)
 
 corDF <- corDF[order(-corDF[,"Correlation.Strength.Absolute"]),]
-print(t(corDF))
+print(corDF)
 ```
 The above dataframe shows the correlations strength between classe and rest variables in descending order.
 
