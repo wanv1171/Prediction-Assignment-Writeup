@@ -177,85 +177,62 @@ corDF &lt;- data.frame(&quot;Correlation Strength Absolute&quot; = corVal,
                     &quot;Correlation Type&quot; = corType)
 
 corDF &lt;- corDF[order(-corDF[,&quot;Correlation.Strength.Absolute&quot;]),]
-print(t(corDF))</code></pre>
-<pre><code>##                               modelTrain$classe pitch_forearm 
-## Correlation.Strength.Absolute &quot;1.0000000000&quot;    &quot;0.3946419992&quot;
-## Correlation.Type              &quot;&quot;                &quot;Polyserial&quot;  
-##                               magnet_arm_x   magnet_belt_y  magnet_arm_y  
-## Correlation.Strength.Absolute &quot;0.3218400470&quot; &quot;0.3132620342&quot; &quot;0.2777378848&quot;
-## Correlation.Type              &quot;Polyserial&quot;   &quot;Polyserial&quot;   &quot;Polyserial&quot;  
-##                               accel_arm_x    pitch_arm     
-## Correlation.Strength.Absolute &quot;0.2614073924&quot; &quot;0.2005329570&quot;
-## Correlation.Type              &quot;Polyserial&quot;   &quot;Polyserial&quot;  
-##                               magnet_forearm_x magnet_belt_z 
-## Correlation.Strength.Absolute &quot;0.1980513946&quot;   &quot;0.1935396021&quot;
-## Correlation.Type              &quot;Polyserial&quot;     &quot;Polyserial&quot;  
-##                               accel_forearm_x magnet_arm_z  
-## Correlation.Strength.Absolute &quot;0.1931368506&quot;  &quot;0.1774673642&quot;
-## Correlation.Type              &quot;Polyserial&quot;    &quot;Polyserial&quot;  
-##                               total_accel_forearm magnet_dumbbell_z
-## Correlation.Strength.Absolute &quot;0.1755691742&quot;      &quot;0.1725314555&quot;   
-## Correlation.Type              &quot;Polyserial&quot;        &quot;Polyserial&quot;     
-##                               accel_dumbbell_x total_accel_arm
-## Correlation.Strength.Absolute &quot;0.1403481813&quot;   &quot;0.1244753170&quot; 
-## Correlation.Type              &quot;Polyserial&quot;     &quot;Polyserial&quot;   
-##                               magnet_forearm_y roll_arm      
-## Correlation.Strength.Absolute &quot;0.1212625417&quot;   &quot;0.1159003247&quot;
-## Correlation.Type              &quot;Polyserial&quot;     &quot;Polyserial&quot;  
-##                               pitch_dumbbell accel_arm_y   
-## Correlation.Strength.Absolute &quot;0.1045314560&quot; &quot;0.0860726411&quot;
-## Correlation.Type              &quot;Polyserial&quot;   &quot;Polyserial&quot;  
-##                               magnet_dumbbell_x accel_dumbbell_z
-## Correlation.Strength.Absolute &quot;0.0828416343&quot;    &quot;0.0827534048&quot;  
-## Correlation.Type              &quot;Polyserial&quot;      &quot;Polyserial&quot;    
-##                               accel_belt_z   total_accel_belt
-## Correlation.Strength.Absolute &quot;0.0804657682&quot; &quot;0.0762245328&quot;  
-## Correlation.Type              &quot;Polyserial&quot;   &quot;Polyserial&quot;    
-##                               roll_belt      yaw_arm       
-## Correlation.Strength.Absolute &quot;0.0632515143&quot; &quot;0.0614275720&quot;
-## Correlation.Type              &quot;Polyserial&quot;   &quot;Polyserial&quot;  
-##                               gyros_dumbbell_y roll_dumbbell 
-## Correlation.Strength.Absolute &quot;0.0531364562&quot;   &quot;0.0435605702&quot;
-## Correlation.Type              &quot;Polyserial&quot;     &quot;Polyserial&quot;  
-##                               magnet_forearm_z yaw_forearm   
-## Correlation.Strength.Absolute &quot;0.0427270135&quot;   &quot;0.0422239218&quot;
-## Correlation.Type              &quot;Polyserial&quot;     &quot;Polyserial&quot;  
-##                               accel_arm_z    roll_forearm  
-## Correlation.Strength.Absolute &quot;0.0373493834&quot; &quot;0.0364622099&quot;
-## Correlation.Type              &quot;Polyserial&quot;   &quot;Polyserial&quot;  
-##                               total_accel_dumbbell gyros_belt_y  
-## Correlation.Strength.Absolute &quot;0.0358459714&quot;       &quot;0.0337713538&quot;
-## Correlation.Type              &quot;Polyserial&quot;         &quot;Polyserial&quot;  
-##                               magnet_belt_x  gyros_arm_y   
-## Correlation.Strength.Absolute &quot;0.0242865506&quot; &quot;0.0230310844&quot;
-## Correlation.Type              &quot;Polyserial&quot;   &quot;Polyserial&quot;  
-##                               gyros_forearm_x accel_forearm_y
-## Correlation.Strength.Absolute &quot;0.0214436074&quot;  &quot;0.0196018712&quot; 
-## Correlation.Type              &quot;Polyserial&quot;    &quot;Polyserial&quot;   
-##                               gyros_belt_x   gyros_dumbbell_z
-## Correlation.Strength.Absolute &quot;0.0186179250&quot; &quot;0.0183457900&quot;  
-## Correlation.Type              &quot;Polyserial&quot;   &quot;Polyserial&quot;    
-##                               accel_belt_x   gyros_dumbbell_x
-## Correlation.Strength.Absolute &quot;0.0144146727&quot; &quot;0.0137997292&quot;  
-## Correlation.Type              &quot;Polyserial&quot;   &quot;Polyserial&quot;    
-##                               gyros_belt_z   yaw_belt       yaw_dumbbell  
-## Correlation.Strength.Absolute &quot;0.0137995222&quot; &quot;0.0119839981&quot; &quot;0.0101243452&quot;
-## Correlation.Type              &quot;Polyserial&quot;   &quot;Polyserial&quot;   &quot;Polyserial&quot;  
-##                               gyros_forearm_z accel_belt_y  
-## Correlation.Strength.Absolute &quot;0.0098411863&quot;  &quot;0.0093692480&quot;
-## Correlation.Type              &quot;Polyserial&quot;    &quot;Polyserial&quot;  
-##                               num_window     gyros_arm_z    gyros_arm_x   
-## Correlation.Strength.Absolute &quot;0.0076089636&quot; &quot;0.0069041167&quot; &quot;0.0056130053&quot;
-## Correlation.Type              &quot;Polyserial&quot;   &quot;Polyserial&quot;   &quot;Polyserial&quot;  
-##                               pitch_belt     gyros_forearm_y
-## Correlation.Strength.Absolute &quot;0.0043013012&quot; &quot;0.0037075672&quot; 
-## Correlation.Type              &quot;Polyserial&quot;   &quot;Polyserial&quot;   
-##                               accel_forearm_z magnet_dumbbell_y
-## Correlation.Strength.Absolute &quot;0.0030673113&quot;  &quot;0.0020936231&quot;   
-## Correlation.Type              &quot;Polyserial&quot;    &quot;Polyserial&quot;     
-##                               accel_dumbbell_y
-## Correlation.Strength.Absolute &quot;0.0002621574&quot;  
-## Correlation.Type              &quot;Polyserial&quot;</code></pre>
+print(corDF)</code></pre>
+<pre><code>##                      Correlation.Strength.Absolute Correlation.Type
+## modelTrain$classe                     1.0000000000                 
+## pitch_forearm                         0.3946419992       Polyserial
+## magnet_arm_x                          0.3218400470       Polyserial
+## magnet_belt_y                         0.3132620342       Polyserial
+## magnet_arm_y                          0.2777378848       Polyserial
+## accel_arm_x                           0.2614073924       Polyserial
+## pitch_arm                             0.2005329570       Polyserial
+## magnet_forearm_x                      0.1980513946       Polyserial
+## magnet_belt_z                         0.1935396021       Polyserial
+## accel_forearm_x                       0.1931368506       Polyserial
+## magnet_arm_z                          0.1774673642       Polyserial
+## total_accel_forearm                   0.1755691742       Polyserial
+## magnet_dumbbell_z                     0.1725314555       Polyserial
+## accel_dumbbell_x                      0.1403481813       Polyserial
+## total_accel_arm                       0.1244753170       Polyserial
+## magnet_forearm_y                      0.1212625417       Polyserial
+## roll_arm                              0.1159003247       Polyserial
+## pitch_dumbbell                        0.1045314560       Polyserial
+## accel_arm_y                           0.0860726411       Polyserial
+## magnet_dumbbell_x                     0.0828416343       Polyserial
+## accel_dumbbell_z                      0.0827534048       Polyserial
+## accel_belt_z                          0.0804657682       Polyserial
+## total_accel_belt                      0.0762245328       Polyserial
+## roll_belt                             0.0632515143       Polyserial
+## yaw_arm                               0.0614275720       Polyserial
+## gyros_dumbbell_y                      0.0531364562       Polyserial
+## roll_dumbbell                         0.0435605702       Polyserial
+## magnet_forearm_z                      0.0427270135       Polyserial
+## yaw_forearm                           0.0422239218       Polyserial
+## accel_arm_z                           0.0373493834       Polyserial
+## roll_forearm                          0.0364622099       Polyserial
+## total_accel_dumbbell                  0.0358459714       Polyserial
+## gyros_belt_y                          0.0337713538       Polyserial
+## magnet_belt_x                         0.0242865506       Polyserial
+## gyros_arm_y                           0.0230310844       Polyserial
+## gyros_forearm_x                       0.0214436074       Polyserial
+## accel_forearm_y                       0.0196018712       Polyserial
+## gyros_belt_x                          0.0186179250       Polyserial
+## gyros_dumbbell_z                      0.0183457900       Polyserial
+## accel_belt_x                          0.0144146727       Polyserial
+## gyros_dumbbell_x                      0.0137997292       Polyserial
+## gyros_belt_z                          0.0137995222       Polyserial
+## yaw_belt                              0.0119839981       Polyserial
+## yaw_dumbbell                          0.0101243452       Polyserial
+## gyros_forearm_z                       0.0098411863       Polyserial
+## accel_belt_y                          0.0093692480       Polyserial
+## num_window                            0.0076089636       Polyserial
+## gyros_arm_z                           0.0069041167       Polyserial
+## gyros_arm_x                           0.0056130053       Polyserial
+## pitch_belt                            0.0043013012       Polyserial
+## gyros_forearm_y                       0.0037075672       Polyserial
+## accel_forearm_z                       0.0030673113       Polyserial
+## magnet_dumbbell_y                     0.0020936231       Polyserial
+## accel_dumbbell_y                      0.0002621574       Polyserial</code></pre>
 <p>The above dataframe shows the correlations strength between classe and rest variables in descending order.</p>
 </div>
 <div id="prediction-models" class="section level2">
